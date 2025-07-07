@@ -1,63 +1,96 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
-import Head from 'next/head';
 
 export default function Home() {
   const [serverIp, setServerIp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const [darkMode, setDarkMode] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!serverIp.trim()) {
       return;
     }
 
     setIsLoading(true);
-    router.push(`/server/${encodeURIComponent(serverIp.trim())}`);
+    setTimeout(() => {
+      setIsLoading(false);
+      alert(`Checking server: ${serverIp.trim()}`);
+    }, 2000);
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
   };
 
   return (
-    <>
-      <Head>
-        <title>McStatus.eu - Minecraft Server Status</title>
-        <meta name="description" content="Check if your Minecraft server is online and get detailed information" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
-
-      <div className="bg-gray-50 min-h-screen">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="max-w-6xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-gray-900">McStatus.eu</h1>
-              <nav className="hidden md:flex space-x-6">
-                <a href="#" className="text-gray-600 hover:text-gray-900">Home</a>
-                <a href="#" className="text-gray-600 hover:text-gray-900">API</a>
-                <a href="#" className="text-gray-600 hover:text-gray-900">Help</a>
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
+      {/* Header */}
+      <header className={`border-b transition-colors duration-300 ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+        <div className="max-w-5xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
+            <h1 className={`text-2xl font-bold transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              McStatus.eu
+            </h1>
+            <div className="flex items-center space-x-8">
+              <nav className="hidden md:flex space-x-8">
+                <a href="#" className={`transition-colors duration-300 ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>
+                  Home
+                </a>
+                <a href="#" className={`transition-colors duration-300 ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>
+                  API
+                </a>
+                <a href="#" className={`transition-colors duration-300 ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>
+                  Help
+                </a>
               </nav>
+              
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={toggleDarkMode}
+                className={`p-2 rounded-xl transition-all duration-300 ${
+                  darkMode 
+                    ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+              >
+                {darkMode ? (
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Main Content */}
-        <main className="max-w-4xl mx-auto px-4 py-16">
-          {/* Hero Section */}
-          <div className="text-center mb-12">
-            <h2 className="text-5xl font-bold text-gray-900 mb-6">
-              Minecraft Server Status Checker
-            </h2>
-            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-              Check if your Minecraft server is online and get detailed information about players, version, and more.
-            </p>
-          </div>
+      {/* Main Content */}
+      <main className="max-w-5xl mx-auto px-6">
+        {/* Hero Section */}
+        <div className="text-center pt-24 pb-20">
+          <h2 className={`text-6xl font-light mb-6 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Minecraft Server Status
+          </h2>
+          <p className={`text-xl max-w-3xl mx-auto transition-colors duration-300 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            Check if your Minecraft server is online quickly and easily, and get detailed information.
+          </p>
+        </div>
 
-          {/* Search Form */}
-          <div className="bg-white rounded-lg shadow-lg border p-8 mb-16">
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
+        {/* Search Form */}
+        <div className="mb-32">
+          <div className={`rounded-2xl p-8 shadow-xl transition-all duration-300 ${
+            darkMode 
+              ? 'bg-gray-800 border border-gray-700' 
+              : 'bg-white border border-gray-200'
+          }`}>
+            <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
-                <label htmlFor="ip" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="ip" className={`block text-sm font-medium mb-4 transition-colors duration-300 ${
+                  darkMode ? 'text-gray-200' : 'text-gray-700'
+                }`}>
                   Server IP Address
                 </label>
                 <input 
@@ -66,76 +99,82 @@ export default function Home() {
                   value={serverIp}
                   onChange={(e) => setServerIp(e.target.value)}
                   placeholder="e.g. play.hypixel.net or 192.168.1.100:25565"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
-                  required
+                  className={`w-full px-4 py-4 rounded-xl text-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    darkMode 
+                      ? 'bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:bg-gray-600' 
+                      : 'bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:bg-white'
+                  }`}
                 />
               </div>
               <div className="flex items-end">
                 <button 
-                  type="submit" 
+                  onClick={handleSubmit}
                   disabled={isLoading}
-                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors text-lg"
+                  className={`px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'
+                  } ${
+                    isLoading
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                  }`}
                 >
-                  {isLoading ? 'Checking...' : 'Check Status'}
+                  {isLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Checking...</span>
+                    </div>
+                  ) : (
+                    'Check Status'
+                  )}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
+        </div>
+      </main>
 
-          {/* Features */}
-          <div className="text-center">
-            <h3 className="text-3xl font-bold text-gray-900 mb-12">Why McStatus.eu?</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-lg mx-auto mb-6 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                  </svg>
-                </div>
-                <h4 className="text-xl font-semibold text-gray-900 mb-3">Fast</h4>
-                <p className="text-gray-600">Get server status in milliseconds</p>
-              </div>
-              <div className="p-6">
-                <div className="w-16 h-16 bg-green-100 rounded-lg mx-auto mb-6 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                  </svg>
-                </div>
-                <h4 className="text-xl font-semibold text-gray-900 mb-3">Free</h4>
-                <p className="text-gray-600">No registration required, completely free</p>
-              </div>
-              <div className="p-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-lg mx-auto mb-6 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                  </svg>
-                </div>
-                <h4 className="text-xl font-semibold text-gray-900 mb-3">Reliable</h4>
-                <p className="text-gray-600">99.9% uptime, available 24/7</p>
+      {/* Footer */}
+      <footer className={`border-t transition-colors duration-300 ${
+        darkMode 
+          ? 'border-gray-800 bg-gray-800' 
+          : 'border-gray-200 bg-gray-50'
+      }`}>
+        <div className="max-w-5xl mx-auto px-6 py-12">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <span className={`text-lg font-semibold transition-colors duration-300 ${
+                darkMode ? 'text-white' : 'text-gray-900'
+              }`}>
+                McStatus.eu
+              </span>
+            </div>
+            <div className="text-center md:text-right">
+              <p className={`text-sm mb-2 transition-colors duration-300 ${
+                darkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                © 2025 McStatus.eu
+              </p>
+              <div className="flex space-x-6 justify-center md:justify-end">
+                <a href="#" className={`text-sm transition-colors duration-300 ${
+                  darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
+                }`}>
+                  Privacy
+                </a>
+                <a href="#" className={`text-sm transition-colors duration-300 ${
+                  darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
+                }`}>
+                  Terms
+                </a>
+                <a href="#" className={`text-sm transition-colors duration-300 ${
+                  darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
+                }`}>
+                  API
+                </a>
               </div>
             </div>
           </div>
-        </main>
-
-        {/* Footer */}
-        <footer className="bg-white border-t mt-20">
-          <div className="max-w-6xl mx-auto px-4 py-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="mb-4 md:mb-0">
-                <span className="text-lg font-semibold text-gray-900">McStatus.eu</span>
-              </div>
-              <div className="text-center md:text-right">
-                <p className="text-gray-600 text-sm">© 2025 McStatus.eu. All rights reserved.</p>
-                <div className="flex space-x-4 mt-2 justify-center md:justify-end">
-                  <a href="#" className="text-gray-500 hover:text-gray-700 text-sm">Privacy</a>
-                  <a href="#" className="text-gray-500 hover:text-gray-700 text-sm">Terms</a>
-                  <a href="#" className="text-gray-500 hover:text-gray-700 text-sm">API</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </>
+        </div>
+      </footer>
+    </div>
   );
 }
