@@ -31,7 +31,7 @@ export default function Home() {
               McStatus.eu
             </h1>
             <div className="flex items-center space-x-8">
-              <nav className="hidden md:flex space-x-8">
+              <nav className="flex space-x-6 md:space-x-8">
                 <a href="#" className={`transition-colors duration-300 ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>
                   Home
                 </a>
