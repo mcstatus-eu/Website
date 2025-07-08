@@ -13,7 +13,7 @@ export default function Home() {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      hwindow.location.href = "https://mcstatus-eu.onrender.com/server/test" + serverIp;
+      hwindow.location.href = "/server/" + serverIp;
     }, 2000);
   };
 
