@@ -14,7 +14,7 @@ export default function ServerStatus() {
     setError(null);
     
     try {
-      const response = await fetch(`https://api.mcstatus.io/v2/java/${encodeURIComponent(serverAddress)}`);
+      const response = await fetch(`https://api.mcstatus.eu/java/${encodeURIComponent(serverAddress)}`);
       
       if (!response.ok) {
         throw new Error(`Server returned ${response.status}: ${response.statusText}`);
