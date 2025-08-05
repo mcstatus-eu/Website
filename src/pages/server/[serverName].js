@@ -8,34 +8,64 @@ export default function ServerStatus() {
   const [searchIp, setSearchIp] = useState('play.extremecraft.net');
   const [darkMode, setDarkMode] = useState(false);
 
-  // Simulate server data
-  useEffect(() => {
-    setServerData({
-      online: true,
-      timestamp: new Date().toISOString(),
-      players: {
-        online: 350,
-        max: 5000,
-        list: null
-      },
-      version: {
-        name: "1.7.2-1.21.7 (Velocity)",
-        protocol: 765
-      },
-      motd: {
-        clean: "**EXTREMECRAFT **\nAnarchy BedWars Creative PvP Factions SkyBlock SkyGrid Slimefun Survival Towny"
+  // Fetch server data from McStatus.eu API
+  const fetchServerData = async (serverAddress) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`https://api.mcstatus.io/v2/status/java/${encodeURIComponent(serverAddress)}`);
+      
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
       }
-    });
+      
+      const data = await response.json();
+      
+      // Transform the API response to match our component structure
+      const transformedData = {
+        online: data.online,
+        timestamp: new Date().toISOString(),
+        players: {
+          online: data.players?.online || 0,
+          max: data.players?.max || 0,
+          list: data.players?.list || null
+        },
+        version: {
+          name: data.version?.name_clean || data.version?.name_raw || 'Unknown',
+          protocol: data.version?.protocol || 0
+        },
+        motd: {
+          clean: data.motd?.clean || 'No MOTD available'
+        },
+        favicon: data.icon || null
+      };
+      
+      setServerData(transformedData);
+    } catch (err) {
+      console.error('Error fetching server data:', err);
+      setError(err.message || 'Failed to fetch server status');
+      setServerData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load initial server data
+  useEffect(() => {
+    fetchServerData(serverName);
   }, []);
 
   const handleSearch = () => {
     if (searchIp.trim()) {
       setServerName(searchIp.trim());
-      setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
+      fetchServerData(searchIp.trim());
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
@@ -107,6 +137,7 @@ export default function ServerStatus() {
                 id="ip" 
                 value={searchIp}
                 onChange={(e) => setSearchIp(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder="e.g. play.hypixel.net or 192.168.1.100:25565"
                 className={`w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   darkMode 
@@ -118,9 +149,12 @@ export default function ServerStatus() {
             <div className="flex items-end">
               <button 
                 onClick={handleSearch}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                disabled={loading}
+                className={`px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Check Status
+                {loading ? 'Checking...' : 'Check Status'}
               </button>
             </div>
           </div>
@@ -252,6 +286,23 @@ export default function ServerStatus() {
                       </div>
                     </div>
                   )}
+
+                  {/* Server Icon */}
+                  {serverData.favicon && (
+                    <div className={`mt-8 pt-8 border-t transition-colors duration-300 ${
+                      darkMode ? 'border-gray-700' : 'border-gray-200'
+                    }`}>
+                      <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        Server Icon
+                      </h3>
+                      <img 
+                        src={serverData.favicon} 
+                        alt="Server Icon" 
+                        className="w-16 h-16 rounded-lg shadow-lg"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Player List */}
@@ -275,10 +326,10 @@ export default function ServerStatus() {
                           }`}
                         >
                           <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
-                            {player.name.charAt(0).toUpperCase()}
+                            {(player.name || player.name_clean || 'Unknown').charAt(0).toUpperCase()}
                           </div>
                           <span className={`font-semibold text-lg transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {player.name}
+                            {player.name || player.name_clean || 'Unknown'}
                           </span>
                         </div>
                       ))}
