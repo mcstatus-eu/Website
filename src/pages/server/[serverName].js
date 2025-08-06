@@ -11,6 +11,7 @@ export default function ServerStatus() {
   const [error, setError] = useState(null);
   const [searchIp, setSearchIp] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [failedAvatars, setFailedAvatars] = useState(new Set());
 
   // Update serverName when router is ready
   useEffect(() => {
@@ -18,6 +19,8 @@ export default function ServerStatus() {
       const decodedServerName = decodeURIComponent(routerServerName);
       setServerName(decodedServerName);
       setSearchIp(decodedServerName);
+      // Reset failed avatars when switching servers
+      setFailedAvatars(new Set());
     }
   }, [router.isReady, routerServerName]);
 
@@ -25,6 +28,7 @@ export default function ServerStatus() {
   const fetchServerData = async (serverAddress) => {
     setLoading(true);
     setError(null);
+    setFailedAvatars(new Set()); // Reset failed avatars on new fetch
     
     try {
       const response = await fetch(`https://api.mcstatus.eu/java/${encodeURIComponent(serverAddress)}`);
@@ -354,28 +358,24 @@ export default function ServerStatus() {
                       {serverData.players.list.map((player, index) => (
                         <div 
                           key={index} 
-                          className={`flex items-center space-x-4 p-4 rounded-xl transition-colors duration-300 ${
+                          className={`flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 hover:scale-105 ${
                             darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
                           }`}
                         >
-                          {player.id ? (
+                          {player.id && !failedAvatars.has(player.id) ? (
                             <img 
                               src={`https://minotar.net/helm/${player.id}/64`}
-                              alt={`${player.name?.clean || player.name?.raw || player.name || 'Unknown'}'s Avatar`}
+                              alt={player.name?.clean || player.name?.raw || player.name || 'Unknown'}
                               className="w-12 h-12 rounded-xl shadow-lg"
-                              onError={(e) => {
-                                // Fallback to gradient avatar if image fails
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
+                              onError={() => {
+                                setFailedAvatars(prev => new Set([...prev, player.id]));
                               }}
                             />
-                          ) : null}
-                          <div 
-                            className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg"
-                            style={{ display: player.id ? 'none' : 'flex' }}
-                          >
-                            {(player.name?.clean || player.name?.raw || player.name || 'Unknown').charAt(0).toUpperCase()}
-                          </div>
+                          ) : (
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+                              {(player.name?.clean || player.name?.raw || player.name || 'Unknown').charAt(0).toUpperCase()}
+                            </div>
+                          )}
                           <span className={`font-semibold text-lg transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                             {player.name?.clean || player.name?.raw || player.name || 'Unknown'}
                           </span>
