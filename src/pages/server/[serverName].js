@@ -402,7 +402,7 @@ export default function ServerStatus() {
                       {serverData.players.list.map((player, index) => (
                         <div 
                           key={index} 
-                          className={`flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 hover:scale-105 ${
+                          className={`flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 ${
                             darkMode 
                               ? 'bg-gray-700 hover:bg-gray-600' 
                               : 'bg-gray-50 hover:bg-gray-100'
