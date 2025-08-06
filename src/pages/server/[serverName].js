@@ -76,8 +76,8 @@ export default function ServerStatus() {
       const trimmedIp = searchIp.trim();
       setServerName(trimmedIp);
       fetchServerData(trimmedIp);
-      // Navigate to new server URL
-      router.push(`/${encodeURIComponent(trimmedIp)}`);
+      // Navigate to new server URL with correct path
+      router.push(`/server/${encodeURIComponent(trimmedIp)}`);
     }
   };
 
