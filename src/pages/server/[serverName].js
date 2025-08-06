@@ -92,7 +92,7 @@ export default function ServerStatus() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
       {/* Header */}
       <header className={`border-b transition-colors duration-300 ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 py-6">
@@ -138,7 +138,7 @@ export default function ServerStatus() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="max-w-6xl mx-auto px-6 py-8 flex-grow">
         {/* Search Form */}
         <div className={`rounded-2xl p-6 shadow-xl mb-8 transition-all duration-300 ${
           darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
@@ -359,10 +359,10 @@ export default function ServerStatus() {
                           }`}
                         >
                           <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
-                            {(player.name || player.name_clean || 'Unknown').charAt(0).toUpperCase()}
+                            {(player.name?.clean || player.name?.raw || player.name || 'Unknown').charAt(0).toUpperCase()}
                           </div>
                           <span className={`font-semibold text-lg transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {player.name || player.name_clean || 'Unknown'}
+                            {player.name?.clean || player.name?.raw || player.name || 'Unknown'}
                           </span>
                         </div>
                       ))}
@@ -388,7 +388,7 @@ export default function ServerStatus() {
       </main>
 
       {/* Footer */}
-      <footer className={`border-t mt-20 transition-colors duration-300 ${
+      <footer className={`border-t transition-colors duration-300 ${
         darkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-200 bg-gray-50'
       }`}>
         <div className="max-w-6xl mx-auto px-6 py-12">
