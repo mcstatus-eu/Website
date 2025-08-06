@@ -1,15 +1,25 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-export default function ServerStatus({ serverName: propServerName }) {
-  // Extract server name from filename or use prop
-  const extractedServerName = propServerName || window.location.pathname.split('/').pop().replace('.js', '') || 'play.extremecraft.net';
+export default function ServerStatus() {
+  const router = useRouter();
+  const { serverName: routerServerName } = router.query;
   
-  const [serverName, setServerName] = useState(extractedServerName);
+  const [serverName, setServerName] = useState('');
   const [serverData, setServerData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searchIp, setSearchIp] = useState(extractedServerName);
+  const [searchIp, setSearchIp] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+
+  // Update serverName when router is ready
+  useEffect(() => {
+    if (router.isReady && routerServerName) {
+      const decodedServerName = decodeURIComponent(routerServerName);
+      setServerName(decodedServerName);
+      setSearchIp(decodedServerName);
+    }
+  }, [router.isReady, routerServerName]);
 
   // Fetch server data from McStatus.eu API
   const fetchServerData = async (serverAddress) => {
@@ -54,15 +64,20 @@ export default function ServerStatus({ serverName: propServerName }) {
     }
   };
 
-  // Load initial server data
+  // Load initial server data when serverName is available
   useEffect(() => {
-    fetchServerData(serverName);
-  }, []);
+    if (serverName) {
+      fetchServerData(serverName);
+    }
+  }, [serverName]);
 
   const handleSearch = () => {
-    if (searchIp.trim()) {
-      setServerName(searchIp.trim());
-      fetchServerData(searchIp.trim());
+    if (searchIp.trim() && searchIp.trim() !== serverName) {
+      const trimmedIp = searchIp.trim();
+      setServerName(trimmedIp);
+      fetchServerData(trimmedIp);
+      // Navigate to new server URL
+      router.push(`/${encodeURIComponent(trimmedIp)}`);
     }
   };
 
@@ -141,8 +156,11 @@ export default function ServerStatus({ serverName: propServerName }) {
                 value={searchIp}
                 onChange={(e) => setSearchIp(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="e.g. play.hypixel.net or 192.168.1.100:25565"
+                disabled={!router.isReady}
+                placeholder={serverName ? `Currently: ${serverName}` : "Loading..."}
                 className={`w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  !router.isReady ? 'opacity-50 cursor-not-allowed' : ''
+                } ${
                   darkMode 
                     ? 'bg-gray-700 border border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500'
@@ -152,9 +170,9 @@ export default function ServerStatus({ serverName: propServerName }) {
             <div className="flex items-end">
               <button 
                 onClick={handleSearch}
-                disabled={loading}
+                disabled={loading || !router.isReady}
                 className={`px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl ${
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                  loading || !router.isReady ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 {loading ? 'Checking...' : 'Check Status'}
@@ -166,17 +184,29 @@ export default function ServerStatus({ serverName: propServerName }) {
         {/* Title */}
         <div className="mb-8">
           <h1 className={`text-4xl font-bold mb-2 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Server Status: {serverName}
+            Server Status: {serverName || 'Loading...'}
           </h1>
-          {serverData && !loading && (
+          {serverData && !loading && serverName && (
             <p className={`transition-colors duration-300 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               Last checked: {new Date(serverData.timestamp).toLocaleString()}
             </p>
           )}
         </div>
 
+        {/* Router Loading State */}
+        {!router.isReady && (
+          <div className={`rounded-2xl p-8 text-center shadow-xl transition-all duration-300 ${
+            darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+          }`}>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className={`transition-colors duration-300 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Loading server information...
+            </p>
+          </div>
+        )}
+
         {/* Loading State */}
-        {loading && (
+        {loading && serverName && (
           <div className={`rounded-2xl p-8 text-center shadow-xl transition-all duration-300 ${
             darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
           }`}>
@@ -188,7 +218,7 @@ export default function ServerStatus({ serverName: propServerName }) {
         )}
 
         {/* Error State */}
-        {error && (
+        {error && serverName && (
           <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8">
             <div className="flex items-center">
               <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
@@ -198,7 +228,7 @@ export default function ServerStatus({ serverName: propServerName }) {
         )}
 
         {/* Server Data */}
-        {serverData && !loading && (
+        {serverData && !loading && serverName && (
           <>
             {/* Status Alert */}
             {serverData.online ? (
