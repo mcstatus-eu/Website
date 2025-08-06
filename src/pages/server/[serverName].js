@@ -354,11 +354,26 @@ export default function ServerStatus() {
                       {serverData.players.list.map((player, index) => (
                         <div 
                           key={index} 
-                          className={`flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 hover:scale-105 ${
+                          className={`flex items-center space-x-4 p-4 rounded-xl transition-colors duration-300 ${
                             darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
                           }`}
                         >
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+                          {player.id ? (
+                            <img 
+                              src={`https://minotar.net/helm/${player.id}/64`}
+                              alt={`${player.name?.clean || player.name?.raw || player.name || 'Unknown'}'s Avatar`}
+                              className="w-12 h-12 rounded-xl shadow-lg"
+                              onError={(e) => {
+                                // Fallback to gradient avatar if image fails
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div 
+                            className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg"
+                            style={{ display: player.id ? 'none' : 'flex' }}
+                          >
                             {(player.name?.clean || player.name?.raw || player.name || 'Unknown').charAt(0).toUpperCase()}
                           </div>
                           <span className={`font-semibold text-lg transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
