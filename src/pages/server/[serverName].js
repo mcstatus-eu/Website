@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 
-export default function ServerStatus() {
-  const [serverName, setServerName] = useState('play.extremecraft.net');
+export default function ServerStatus({ serverName: propServerName }) {
+  // Extract server name from filename or use prop
+  const extractedServerName = propServerName || window.location.pathname.split('/').pop().replace('.js', '') || 'play.extremecraft.net';
+  
+  const [serverName, setServerName] = useState(extractedServerName);
   const [serverData, setServerData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searchIp, setSearchIp] = useState('play.extremecraft.net');
+  const [searchIp, setSearchIp] = useState(extractedServerName);
   const [darkMode, setDarkMode] = useState(false);
 
   // Fetch server data from McStatus.eu API
